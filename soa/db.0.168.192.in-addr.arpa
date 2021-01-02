@@ -1,0 +1,15 @@
+$TTL	86400 ; default time-to-live
+$ORIGIN 0.168.192.in-addr.arpa.
+@       1D      IN      SOA     ns.formation.lab.       daxxramas.formation.lab. (
+                                2021010200              ; serial (YYYYMMDDXX with Y = year, M = month, D = day, X = daily modification number)
+                                3H                      ; refresh period
+                                15                      ; retry period
+                                1W                      ; expire time
+                                3H                      ; minimum TTL
+);
+@       IN      NS              ns.formation.lab.
+; server hosts definitions
+1       IN      PTR             resolv.formation.lab.
+2       IN      PTR             ns.formation.lab.
+4       IN      PTR             www.formation.lab.
+

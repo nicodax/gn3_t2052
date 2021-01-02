@@ -1,0 +1,16 @@
+$TTL 3H ; default time-to-live                                                                                         
+@                               IN      SOA     ns.formation.lab.       daxxramass.formation.lab. (                    
+                                        2021010100      ; serial (YYYYMMDDXX with Y = year, M = month, D = day, X = daily modificqtion
+                                        604800          ; refresh period                                               
+                                        86400           ; retry period                                                 
+                                        2419200         ; expire time                                                  
+                                        604800          ; minimum TTL                                                  
+);                                                                                                                     
+; Name Servers                                                                                                         
+formation.lab.                  IN      NS      ns.formation.lab.                                                      
+ns                              IN      A       192.168.0.2                                                            
+                                                                                                                       
+; Other A records                                                                                                      
+@                               IN      A       192.168.0.4                                                            
+www                             IN      A       192.168.0.4                                                            
+resolv                          IN      A       192.168.0.1
