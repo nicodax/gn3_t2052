@@ -6,7 +6,7 @@ create configuration file on the DHCP server :
 / # vi /etc/dhcp/dhcpd.conf
 ```
 
-copy the content of /dhcpd/dhcpd.conf in /etc/dhcp/dhcd.conf. The line ```option domain-name-servers 192.168.0.1;``` will be usefull later on, as will the other commented lines
+copy the content of /dhcpd/dhcpd.conf in /etc/dhcp/dhcd.conf. The commented line ```option domain-name-servers 192.168.0.1;``` will be usefull later on
 
 run the configuration file to start the DHCP server :
 
@@ -144,7 +144,7 @@ check both configurations.
 
 In order to allow the whole subnet to access the formation.lab zone, the resolver needs to know he can forward requests concerning that zone. On the resolver, uncomment the ```zone "formation.lab" { ... };``` block in the section ```# CUSTOM ZONES SECTION``` of the /etc/named/named.conf file
 
-At the moment, only the client knows ther is a resolver server in the subnet. edit the config file of all other server hosts and uncomment the line ```up echo nameserver 192.168.0.1 > /etc/resolv.conf```
+At the moment, only the client knows ther is a resolver server in the subnet. edit the config file of all other server hosts and uncomment the line ```up echo nameserver 192.168.0.1 > /etc/resolv.conf``` in the config files
 
 The server hosts won't know about this until you restart them. In order to save the configuration files and zone files, save the path to their respective directories :
 * on the resolver and soa servers, right_click > configure. select the Advanced section. in "Additional directories to make persistent [etc]" box, add ```/etc/bind/```
@@ -191,7 +191,7 @@ check both configurations.
 / # named-checkzone 0.168.192.in-addr.arpa /etc/bind/db.0.168.192.in-addr.arpa
 ```
 
-in order to allow the whole subnet to access the formation.lab zone, the resolver needs to know he can forward requests concerning that zone. On the resolver, uncomment the zone "0.168.192.in-addr.arpa.lab" { ... }; block in the section # CUSTOM ZONES SECTION of the /etc/named/named.conf file
+in order to allow the whole subnet to access the formation.lab zone, the resolver needs to know he can forward requests concerning that zone. On the resolver, uncomment the ```zone "0.168.192.in-addr.arpa.lab" { ... };``` block in the section ```# CUSTOM ZONES SECTION``` of the /etc/named/named.conf file
 
 restart both the resolver and the soa
 
@@ -211,4 +211,24 @@ Address:	192.168.0.1:53
 
 Non-authoritative answer:
 1.0.168.192.in-addr.arpa	name = resolv.formation.lab
+```
+
+# Apache
+
+open a terminal outside of gns3
+
+```
+cd /home/user/Images/apache
+```
+
+compile the apache image
+
+```
+docker build . -t me/myapache
+```
+
+run the web server
+
+```
+/run-httpd.sh &
 ```
