@@ -227,7 +227,7 @@ compile the apache image
 docker build . -t me/myapache
 ```
 
-in gns3, delete the www host and replace it by a new End Device > Admin - Apache
+in gns3, delete the www host and replace it by a new End Device > Admin - Apache. edit config file as needed
 
 right_click > configure. select the Advanced section. in "Additional directories to make persistent [etc]" box, add ```/etc/bind/```. Make sure its config file is correct and run the web server :
 
@@ -236,6 +236,8 @@ right_click > configure. select the Advanced section. in "Additional directories
 ```
 
 # Configure Apache
+
+configure a server name. edit the httpd.config file and look for the line ```ServerName www.example.com```, uncomment it and change it to ```ServerName www.formation.lab```
 
 create an index.html file in the Web Documents root directory :
 
@@ -248,3 +250,140 @@ copy the content of /Admin-Apache-1/www/html/index.html in /var/www/html/index.h
 restart the server
 
 access http://www.formation.lab from the client's web browser. the index.html file should load
+
+### configuration exercices
+
+the configuration file is in /etc/httpd/conf/httpd.conf
+
+* change the web document root to /home/user/web :
+	* create the directories user and web to make the afore mentioned pathname valid
+	* move the index.html file from /var/www/html to /home/user/web
+	* edit the dhcpd.conf file. look for the line ```DocumentRoot /var/www/html``` and change it to ```DocumentRoot /home/user/web```. a few lines below should be a line ```<Directory "/var/www/html">```. change the pathname there as well
+	* restart the server
+	* access www.formation.lab from the client's web browser. the index.html file should load
+
+```
+mkdir -p /home/user/web
+mv /var/www/html/index.html /home/user/web/index.html
+```
+
+* change the admin email : edit the dhcpd.conf file. look for the line ```ServerAdmin root@localhost``` and change the email.
+* change the default html file name for each directory to test.html :
+	* edit the dhcpd.conf file. look for the line ```DirectoryIndex index.html``` and change it to ```DirectoryIndex test.html```
+	* change the index.html in /home/user/web to test.html
+	* resart the server
+	* access www.formation.lab from the client's web browser. the test.html file should load
+
+```
+mv /home/user/web/index.html /home/user/web/test.html
+```
+
+* the server should not listen to ip addresses outside of the local network
+	* edit the dhcpd.conf file. look for the block defined by ```<Directory "/var/www/html">```. inside, change the line ```Require all granted``` by ```Require ip 192.168.0.0/24```
+	* restart the server
+	* access www.formation.lab from the client's web browser. the test.html file should load
+
+* the server listens to ports 80 and 8080
+	* edit the dhcpd.conf file. look for the line ```Listen 80```. below, add the line ```Listen 8080```
+
+* the access to /home/user/web/site1/perso is protected by authentification
+	* create a .htpasswd file in /etc/httpd/conf/
+	* edit the dhcpd.conf file. create a new ```<Directory>``` block and configure it to ask for authentification
+
+```
+htpasswd -c /etc/httpd/conf/.htpasswd user
+```
+
+enter the password for user
+
+```
+user123
+```
+
+```
+<Directory "/home/user/web/site1/perso">
+    AuthType Basic
+    AuthName "Restricted Content"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+</Directory>
+```
+
+# Setting up an SMTP mail server
+
+open a terminal outside of gns3
+
+```
+cd /home/user/Images/mailServers
+```
+
+compile the apache image
+
+```
+docker build . -t me/mailserver
+```
+
+in gns3, delete the www host and replace it by a new End Device > Admin - Mail Server. edit config file as needed
+
+right_click > configure. select the Advanced section. in "Additional directories to make persistent [etc]" box, add ```/etc/mail/```. Make sure its config file is correct and run the web server :
+
+```
+/usr/sbin/sendmail -bd -q15s -v &
+```
+
+# SMTP server configuration (with POP/IMAP)
+
+create two linux users on mail server
+
+```
+sh-4.4# useradd bob
+sh-4.4# passwd bob
+Changing password for user bob.
+New password:
+Retype new password:
+passwd: all authentication tokens updated successfully.
+sh-4.4# 
+sh-4.4# useradd amy
+sh-4.4# passwd amy
+Changing password for user amy.
+New password:
+Retype new password:
+passwd: all authentication tokens updated successfully.
+```
+
+```mail``` command examples :
+
+```
+# send mail to bob (from root)
+sh-4.4# mail bob
+Subject: hi bob
+it's me, root
+EOT
+[1]+  Done                    /usr/sbin/sendmail -bd -q15s -v
+```
+
+```
+# check bob's mailbox
+sh-4.4# mail -f bob
+Heirloom Mail version 12.5 7/5/10.  Type ? for help.
+"bob": 5 messages
+>   1 root                  Mon Jan  4 16:53  21/774   
+    2 root                  Mon Jan  4 16:57  22/767   "Test Subject"
+    3 root                  Mon Jan  4 17:05  22/693   "test"
+    4 root                  Mon Jan  4 17:10  22/691   "hi bob"
+    5 root                  Mon Jan  4 17:16  22/774   "localhost"
+& 4
+Message  4:
+From root@mail  Mon Jan  4 17:10:44 2021
+Return-Path: <root@mail>
+From: root <root@mail>
+Date: Mon, 04 Jan 2021 17:09:44 +0000
+To: bob@mail
+Subject: hi bob
+User-Agent: Heirloom mailx 12.5 7/5/10
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+
+it's me
+
+```
