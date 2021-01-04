@@ -213,7 +213,7 @@ Non-authoritative answer:
 1.0.168.192.in-addr.arpa	name = resolv.formation.lab
 ```
 
-# Apache
+# Setting up an apache web server
 
 open a terminal outside of gns3
 
@@ -227,8 +227,24 @@ compile the apache image
 docker build . -t me/myapache
 ```
 
-run the web server
+in gns3, delete the www host and replace it by a new End Device > Admin - Apache
+
+right_click > configure. select the Advanced section. in "Additional directories to make persistent [etc]" box, add ```/etc/bind/```. Make sure its config file is correct and run the web server :
 
 ```
 /run-httpd.sh &
 ```
+
+# Configure Apache
+
+create an index.html file in the Web Documents root directory :
+
+```
+vi /var/www/html/index.html
+```
+
+copy the content of /Admin-Apache-1/www/html/index.html in /var/www/html/index.html
+
+restart the server
+
+access http://www.formation.lab from the client's web browser. the index.html file should load

@@ -12,4 +12,3 @@ $ORIGIN 0.168.192.in-addr.arpa.
 1       IN      PTR             resolv.formation.lab.
 2       IN      PTR             ns.formation.lab.
 4       IN      PTR             www.formation.lab.
-
